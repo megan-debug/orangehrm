@@ -10,6 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
       - name: Get product version and build version
         id: get_version
         run: |
@@ -38,8 +43,8 @@ jobs:
       - name: Install dependencies
         run: |
           cd src
-          php8.3 -f /usr/bin/composer install --no-dev
-          php8.3 -f /usr/bin/composer dump-autoload --optimize --no-dev --classmap-authoritative
+          composer install --no-dev
+          composer dump-autoload --optimize --no-dev --classmap-authoritative
           cd client
           yarn install
           cd ../../installer/client

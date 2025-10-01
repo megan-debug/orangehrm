@@ -59,6 +59,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
       - name: Copy dump to DB container
         run: docker cp .github/workflows/4x_dumps/${{ matrix.dumps.file }} database:/dump.sql
 
@@ -72,7 +77,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          php8.3 -f /usr/bin/composer install -d src
+          composer install -d src
 
       - name: Run Upgrade
-        run: php8.3 installer/console upgrade:run --dbHost 127.0.0.1 --dbPort 3306 --dbName upgrade --dbUser root --dbUserPassword root --currentVersion ${{ matrix.dumps.version }}
+        run: php installer/console upgrade:run --dbHost 127.0.0.1 --dbPort 3306 --dbName upgrade --dbUser root --dbUserPassword root --currentVersion ${{ matrix.dumps.version }}

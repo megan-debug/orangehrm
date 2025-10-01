@@ -8,6 +8,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
       - name: Install node dependencies
         run: cd src/client && yarn install
 
@@ -25,11 +31,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          php8.3 -f /usr/bin/composer install -d src
-          php8.3 -f /usr/bin/composer install -d devTools/core
+          composer install -d src
+          composer install -d devTools/core
 
       - name: Check PHP Coding Standards
-        run: php devTools/core/console.php php-cs-fix --php php8.3
+        run: php devTools/core/console.php php-cs-fix
 
       - name: Check files changed
         id: git-status
