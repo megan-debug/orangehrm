@@ -43,13 +43,13 @@ jobs:
 
     services:
       mysql:
-        image: "mariadb:10.2"
+        image: "mariadb:11.4"
         env:
           MYSQL_ROOT_PASSWORD: root
         ports:
           - 3306:3306
         options: >-
-          --health-cmd "mysqladmin ping"
+          --health-cmd "mariadb-admin ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 3
@@ -72,7 +72,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          php7.4 -f /usr/bin/composer install -d src
+          php8.3 -f /usr/bin/composer install -d src
 
       - name: Run Upgrade
-        run: php installer/console upgrade:run --dbHost 127.0.0.1 --dbPort 3306 --dbName upgrade --dbUser root --dbUserPassword root --currentVersion ${{ matrix.dumps.version }}
+        run: php8.3 installer/console upgrade:run --dbHost 127.0.0.1 --dbPort 3306 --dbName upgrade --dbUser root --dbUserPassword root --currentVersion ${{ matrix.dumps.version }}

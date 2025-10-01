@@ -78,17 +78,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          php7.4 -f /usr/bin/composer install -d src
-          php7.4 -f /usr/bin/composer install -d devTools/core
+          php8.3 -f /usr/bin/composer install -d src
+          php8.3 -f /usr/bin/composer install -d devTools/core
 
       - name: Install OrangeHRM
         run: |
-          php7.4 installer/cli_install.php
+          php8.3 installer/cli_install.php
 
       - name: Create Test DB
         run: |
           mysqldump -V
-          php7.4 devTools/core/console.php i:create-test-db -p root --dump-options="--column-statistics=0"
+          php8.3 devTools/core/console.php i:create-test-db -p root --dump-options="--column-statistics=0"
 
       - name: Configure LDAP server
         run: |
@@ -150,8 +150,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          php7.4 -f /usr/bin/composer install -d src
-          php7.4 -f /usr/bin/composer install -d devTools/core
+          php8.3 -f /usr/bin/composer install -d src
+          php8.3 -f /usr/bin/composer install -d devTools/core
 
       - name: Install OrangeHRM
         run: |
