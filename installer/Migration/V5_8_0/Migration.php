@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OrangeHRM is a comprehensive Human Resource Management (HRM) System that captures
  * all the essential functionalities required for any enterprise.
@@ -16,15 +17,18 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace OrangeHRM\Installer\Migration\V5_7_1;
+namespace OrangeHRM\Installer\Migration\V5_8_0;
 
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use OrangeHRM\Installer\Util\V1\AbstractMigration;
+use OrangeHRM\Installer\Util\V1\LangStringHelper;
 
 class Migration extends AbstractMigration
 {
+    protected ?LangStringHelper $langStringHelper = null;
+
     /**
      * @inheritDoc
      */
@@ -42,7 +46,7 @@ class Migration extends AbstractMigration
         }
 
         $tableDetails = $this->getSchemaManager()->introspectTable('ohrm_claim_request');
-        $foreignKey = $tableDetails->getForeignKey('fk_currency_id');
+        $foreignKey = $tableDetails->hasForeignKey('fk_currency_id') ? $tableDetails->getForeignKey('fk_currency_id') : null;
         if (!$foreignKey instanceof ForeignKeyConstraint) {
             $foreignKeyConstraint = new ForeignKeyConstraint(
                 ['currency_id'],
@@ -53,6 +57,13 @@ class Migration extends AbstractMigration
             );
             $this->getSchemaHelper()->addForeignKey('ohrm_claim_request', $foreignKeyConstraint);
         }
+
+        $groups = ['auth', 'pim'];
+        foreach ($groups as $group) {
+            $this->getLangStringHelper()->insertOrUpdateLangStrings(__DIR__, $group);
+        }
+
+        $this->updateLangStringVersion($this->getVersion());
     }
 
     /**
@@ -133,6 +144,32 @@ class Migration extends AbstractMigration
      */
     public function getVersion(): string
     {
-        return '5.7.1';
+        return '5.8.0';
+    }
+
+    /**
+     * @return LangStringHelper
+     */
+    private function getLangStringHelper(): LangStringHelper
+    {
+        if (is_null($this->langStringHelper)) {
+            $this->langStringHelper = new LangStringHelper(
+                $this->getConnection()
+            );
+        }
+        return $this->langStringHelper;
+    }
+
+    /**
+     * @param string $version
+     */
+    private function updateLangStringVersion(string $version): void
+    {
+        $qb = $this->createQueryBuilder()
+            ->update('ohrm_i18n_lang_string', 'lang_string')
+            ->set('lang_string.version', ':version')
+            ->setParameter('version', $version);
+        $qb->andWhere($qb->expr()->isNull('lang_string.version'))
+            ->executeStatement();
     }
 }
